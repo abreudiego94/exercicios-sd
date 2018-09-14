@@ -15,7 +15,7 @@ public class TCPServer {
     private ArrayList<Socket> clientes;
 
     public TCPServer() {
-        this.clientes = new ArrayList<Socket> ();
+        this.clientes = new ArrayList<Socket>();
     }
 
     public void iniciarServidor() throws IOException {
@@ -24,11 +24,11 @@ public class TCPServer {
         ServerSocket listenSocket = new ServerSocket(serverPort);
 
         while (true) {
-            System.out.println("Servidor aguardando conexao ...");    
+            System.out.println("Servidor aguardando conexao ...");
             Socket clientSocket = listenSocket.accept();
             System.out.println("Cliente conectado ... Criando thread ...");
             clientes.add(clientSocket);
-            ClientThread c = new ClientThread(clientSocket,clientes);
+            ClientThread c = new ClientThread(clientSocket, clientes);
             c.start();
         } //
     }
@@ -52,7 +52,7 @@ class ClientThread extends Thread {
     Socket clientSocket;
     ArrayList<Socket> clientes;
 
-    public ClientThread(Socket clientSocket,ArrayList<Socket> c) {
+    public ClientThread(Socket clientSocket, ArrayList<Socket> c) {
         try {
             this.clientSocket = clientSocket;
             in = new DataInputStream(clientSocket.getInputStream());
@@ -69,32 +69,29 @@ class ClientThread extends Thread {
         try {
             String buffer = "";
             while (true) {
-               
-                buffer = in.readUTF();
-                 
-                for(int i = 0; i <clientes.size(); i++){
-                   if(buffer == "time" ){
-                       SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
-                       Date d = new Date();
-                      
-                       System.out.println(dateFormat.format(d));
-                       
-                       
-                   }
-                   else if(buffer == "date"){
-                   
-                   }
-                   else if(buffer == "file"){
-                   
-                   }
-                    DataOutputStream out = new DataOutputStream(clientes.get(i).getOutputStream());
-                   out.writeUTF(buffer);
-                
-                }
 
-                
-                
-                
+                buffer = in.readUTF();
+                String res = "COMANDO NÃO ENCONTRADO"  ;
+                Date d = new Date();
+
+                if (null != buffer) switch (buffer) {
+                     
+                    case "time":
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+                       
+                        res = dateFormat.format(d);
+                        break;
+                    case "date":
+                        SimpleDateFormat dateFormatDate = new SimpleDateFormat("dd/MM/YYYY HH:mm");
+                        res = dateFormatDate.format(d);
+                    case "file":
+                        break;
+                    default:
+                        break;
+                }
+              
+                out.writeUTF(res);
+
             }
         } catch (EOFException eofe) {
             System.out.println("EOF: " + eofe.getMessage());
